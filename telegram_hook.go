@@ -162,6 +162,7 @@ func (hook *TelegramHook) createMessage(entry *logrus.Entry) string {
 	return msg
 }
 
+// Fire emits a log message to the Telegram API.
 func (hook *TelegramHook) Fire(entry *logrus.Entry) error {
 	msg := hook.createMessage(entry)
 	err := hook.sendMessage(msg)
