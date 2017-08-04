@@ -23,9 +23,9 @@ type TelegramHook struct {
 // apiRequest encapsulates the request structure we are sending to the
 // Telegram API.
 type apiRequest struct {
-	chatID    string `json:"chat_id"`
-	text      string `json:"text"`
-	parseMode string `json:"parse_mode,omitempty"`
+	ChatID    string `json:"chat_id"`
+	Text      string `json:"text"`
+	ParseMode string `json:"parse_mode,omitempty"`
 }
 
 // apiResponse encapsulates the response structure received from the
@@ -80,10 +80,10 @@ func (hook *TelegramHook) verifyToken() error {
 		// Received an error from the Telegram API
 		msg := "Received error response from Telegram API"
 		if apiRes.ErrorCode != nil {
-			msg = fmt.Sprintf("%s (error code %s)", apiRes.ErrorCode)
+			msg = fmt.Sprintf("%s (error code %d)", msg, *apiRes.ErrorCode)
 		}
 		if apiRes.Desc != nil {
-			msg = fmt.Sprintf("%s: %s", apiRes.Desc)
+			msg = fmt.Sprintf("%s: %s", msg, *apiRes.Desc)
 		}
 		j, _ := json.MarshalIndent(apiRes, "", "\t")
 		msg = fmt.Sprintf("%s\n%s", msg, j)
@@ -126,10 +126,10 @@ func (hook *TelegramHook) sendMessage(msg string) error {
 		// Received an error from the Telegram API
 		msg := "Received error response from Telegram API"
 		if apiRes.ErrorCode != nil {
-			msg = fmt.Sprintf("%s (error code %s)", apiRes.ErrorCode)
+			msg = fmt.Sprintf("%s (error code %d)", msg, *apiRes.ErrorCode)
 		}
 		if apiRes.Desc != nil {
-			msg = fmt.Sprintf("%s: %s", apiRes.Desc)
+			msg = fmt.Sprintf("%s: %s", msg, *apiRes.Desc)
 		}
 		return fmt.Errorf(msg)
 	}
