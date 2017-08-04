@@ -37,6 +37,8 @@ type apiResponse struct {
 	Result    *interface{} `json:"result,omitempty"`
 }
 
+// NewTelegramHook creates a new instance of a hook targeting the
+// Telegram API.
 func NewTelegramHook(appName, authToken, targetID string) (*TelegramHook, error) {
 	client := http.Client{}
 	apiEndpoint := fmt.Sprintf(
@@ -171,6 +173,7 @@ func (hook *TelegramHook) Fire(entry *logrus.Entry) error {
 	return nil
 }
 
+// Levels returns the log levels that the hook should be enabled for.
 func (hook *TelegramHook) Levels() []logrus.Level {
 	return []logrus.Level{
 		logrus.ErrorLevel,
