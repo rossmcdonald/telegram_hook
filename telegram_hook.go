@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 )
 
 // TelegramHook to send logs via the Telegram API.
