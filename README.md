@@ -3,12 +3,13 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/rossmcdonald/telegram_hook)](https://goreportcard.com/report/github.com/rossmcdonald/telegram_hook)
 
 This hook emits log messages (and corresponding fields) to the
-Telegram API. Currently this hook will only emit messages for the
-following levels:
+Telegram API
+for [logrus](https://github.com/Sirupsen/logrus). Currently this hook
+will only emit messages for the following levels:
 
-* ERROR
-* FATAL
-* PANIC
+* `ERROR`
+* `FATAL`
+* `PANIC`
 
 ## Installation
 
@@ -20,7 +21,7 @@ go get github.com/rossmcdonald/telegram_hook
 
 ## Usage
 
-Example usage:
+See the tests for working examples. Also:
 
 ```go
 import (
@@ -42,4 +43,10 @@ func main() {
 	// Receive messages on failures
 	log.Errorf("Uh oh...")
 	...
+	
+}
 ```
+
+## License
+
+MIT
