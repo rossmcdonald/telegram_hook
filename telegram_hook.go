@@ -98,9 +98,9 @@ func (hook *TelegramHook) verifyToken() error {
 // sendMessage issues the provided message to the Telegram API.
 func (hook *TelegramHook) sendMessage(msg string) error {
 	apiReq := apiRequest{
-		chatID:    hook.targetID,
-		text:      msg,
-		parseMode: "HTML",
+		ChatID:    hook.targetID,
+		Text:      msg,
+		ParseMode: "HTML",
 	}
 	b, err := json.Marshal(apiReq)
 	if err != nil {
@@ -108,7 +108,7 @@ func (hook *TelegramHook) sendMessage(msg string) error {
 	}
 
 	res, err := hook.c.Post(
-		hook.apiEndpoint,
+		strings.Join([]string{hook.apiEndpoint, "sendmessage"}, "/"),
 		"application/json",
 		bytes.NewReader(b),
 	)
@@ -155,10 +155,12 @@ func (hook *TelegramHook) createMessage(entry *logrus.Entry) string {
 
 	msg = strings.Join([]string{msg, hook.AppName}, "@")
 	msg = strings.Join([]string{msg, entry.Message}, " - ")
-	fields, _ := json.MarshalIndent(entry.Data, "", "\t")
-	msg = strings.Join([]string{msg, "<pre>"}, "\n")
-	msg = strings.Join([]string{msg, string(fields)}, "\n")
-	msg = strings.Join([]string{msg, "</pre>"}, "\n")
+	fields, err := json.MarshalIndent(entry.Data, "", "\t")
+	if err == nil {
+		msg = strings.Join([]string{msg, "<pre>"}, "\n")
+		msg = strings.Join([]string{msg, string(fields)}, "\n")
+		msg = strings.Join([]string{msg, "</pre>"}, "\n")
+	}
 	return msg
 }
 
@@ -167,7 +169,7 @@ func (hook *TelegramHook) Fire(entry *logrus.Entry) error {
 	msg := hook.createMessage(entry)
 	err := hook.sendMessage(msg)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to read entry, %v", err)
+		fmt.Fprintf(os.Stderr, "Unable to send message, %v", err)
 		return err
 	}
 
