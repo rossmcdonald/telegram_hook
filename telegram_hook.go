@@ -73,14 +73,14 @@ func NewTelegramHook(appName, authToken, targetID string, config ...Config) (*Te
 }
 
 // Async sets logging to telegram as asynchronous
-func Async(b bool) Config {
+func WithAsync(b bool) Config {
 	return func(hook *TelegramHook) {
 		hook.async = b
 	}
 }
 
 // Timeout sets http call timeout for telegram client
-func Timeout(t time.Duration) Config {
+func WithTimeout(t time.Duration) Config {
 	return func(hook *TelegramHook) {
 		if t > 0 {
 			hook.c.Timeout = t
