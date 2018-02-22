@@ -25,6 +25,7 @@ See the tests for working examples. Also:
 
 ```go
 import (
+	"time"
 	log "github.com/Sirupsen/logrus"
 	"github.com/rossmcdonald/telegram_hook"
 )
@@ -34,6 +35,8 @@ func main() {
 		"MyCoolApp",
 		"MYTELEGRAMTOKEN",
 		"@mycoolusername",
+		telegram_hook.WithAsync(true),
+		telegram_hook.WithTimeout(30 * time.Second),
 	)
 	if err != nil {
 		log.Fatalf("Encountered error when creating Telegram hook: %s", err)

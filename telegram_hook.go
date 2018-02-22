@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -18,6 +19,7 @@ type TelegramHook struct {
 	authToken   string
 	targetID    string
 	apiEndpoint string
+	async bool
 }
 
 // apiRequest encapsulates the request structure we are sending to the
@@ -37,9 +39,12 @@ type apiResponse struct {
 	Result    *interface{} `json:"result,omitempty"`
 }
 
+// Config defines a method for additional configuration when instantiating TelegramHook
+type Config func(*TelegramHook)
+
 // NewTelegramHook creates a new instance of a hook targeting the
 // Telegram API.
-func NewTelegramHook(appName, authToken, targetID string) (*TelegramHook, error) {
+func NewTelegramHook(appName, authToken, targetID string, config ...Config) (*TelegramHook, error) {
 	client := http.Client{}
 	apiEndpoint := fmt.Sprintf(
 		"https://api.telegram.org/bot%s",
@@ -51,6 +56,11 @@ func NewTelegramHook(appName, authToken, targetID string) (*TelegramHook, error)
 		authToken:   authToken,
 		targetID:    targetID,
 		apiEndpoint: apiEndpoint,
+		async: false,
+	}
+
+	for _, c := range config {
+		c(&h)
 	}
 
 	// Verify the API token is valid and correct before continuing
@@ -60,6 +70,22 @@ func NewTelegramHook(appName, authToken, targetID string) (*TelegramHook, error)
 	}
 
 	return &h, nil
+}
+
+// Async sets logging to telegram as asynchronous
+func WithAsync(b bool) Config {
+	return func(hook *TelegramHook) {
+		hook.async = b
+	}
+}
+
+// Timeout sets http call timeout for telegram client
+func WithTimeout(t time.Duration) Config {
+	return func(hook *TelegramHook) {
+		if t > 0 {
+			hook.c.Timeout = t
+		}
+	}
 }
 
 // verifyToken issues a test request to the Telegram API to ensure the
@@ -167,6 +193,12 @@ func (hook *TelegramHook) createMessage(entry *logrus.Entry) string {
 // Fire emits a log message to the Telegram API.
 func (hook *TelegramHook) Fire(entry *logrus.Entry) error {
 	msg := hook.createMessage(entry)
+
+	if hook.async {
+		go hook.sendMessage(msg)
+		return nil
+	}
+
 	err := hook.sendMessage(msg)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to send message, %v", err)
