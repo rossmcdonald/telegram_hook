@@ -45,14 +45,20 @@ type Config func(*TelegramHook)
 // NewTelegramHook creates a new instance of a hook targeting the
 // Telegram API.
 func NewTelegramHook(appName, authToken, targetID string, config ...Config) (*TelegramHook, error) {
-	client := http.Client{}
+	client := &http.Client{}
+	return NewTelegramHookWithClient(appName, authToken, targetID, client, config...)
+}
+
+// NewTelegramHook creates a new instance of a hook targeting the
+// Telegram API with custom http.Client.
+func NewTelegramHookWithClient(appName, authToken, targetID string, client *http.Client, config ...Config) (*TelegramHook, error) {
 	apiEndpoint := fmt.Sprintf(
 		"https://api.telegram.org/bot%s",
 		authToken,
 	)
 	h := TelegramHook{
 		AppName:     appName,
-		c:           &client,
+		c:           client,
 		authToken:   authToken,
 		targetID:    targetID,
 		apiEndpoint: apiEndpoint,
