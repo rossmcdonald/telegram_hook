@@ -50,6 +50,44 @@ func main() {
 }
 ```
 
+Also you can set custom http.Client to use SOCKS5 proxy for example
+
+```go
+import (
+	"time"
+	"net/http"
+	
+	"golang.org/x/net/proxy"
+	log "github.com/Sirupsen/logrus"
+	"github.com/rossmcdonald/telegram_hook"
+)
+
+func main() {
+	httpTransport := &http.Transport{}
+    httpClient := &http.Client{Transport: httpTransport}
+    dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:54321", nil, proxy.Direct)
+    httpTransport.Dial = dialer.Dial
+    
+	hook, err := telegram_hook.NewTelegramHookWithClient(
+		"MyCoolApp",
+		"MYTELEGRAMTOKEN",
+		"@mycoolusername",
+		httpClient,
+		telegram_hook.WithAsync(true),
+		telegram_hook.WithTimeout(30 * time.Second),
+	)
+	if err != nil {
+		log.Fatalf("Encountered error when creating Telegram hook: %s", err)
+	}
+	log.AddHook(hook)
+	
+	// Receive messages on failures
+	log.Errorf("Uh oh...")
+	...
+	
+}
+```
+
 ## License
 
 MIT
