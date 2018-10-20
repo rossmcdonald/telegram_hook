@@ -1,6 +1,7 @@
 package telegram_hook_test
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -25,9 +26,10 @@ func TestNewHook(t *testing.T) {
 	}
 	log.AddHook(h)
 
-	log.WithFields(log.Fields{
+	log.WithError(errors.New("an error")).WithFields(log.Fields{
 		"animal": "walrus",
 		"number": 1,
 		"size":   10,
+		"html":   "<b>bold</b>",
 	}).Errorf("A walrus appears")
 }
